@@ -1,6 +1,6 @@
 local VData = {}
 
-local Api_Url = "https://whitelist.vapevoidware.xyz/GlobalFunctions.json"
+local Api_Url = nil
 
 assert(not shared.GlobalFunctionsHandlerExecuted, "Vape Already Injected 2")
 shared.GlobalFunctionsHandlerExecuted = true
