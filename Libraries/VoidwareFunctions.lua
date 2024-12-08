@@ -353,7 +353,7 @@ VWFunctions.EditWL = function(argTable)
 end
 
 VWFunctions.fetchCheatEngineSupportFile = function(fileName)
-    local url = nil
+    local url = "https://raw.githubusercontent.com/randombackup1293/PastewareModded3/main/CheatEngine/"..tostring(fileName)
     local suc, res = pcall(function()
         return game:HttpGet(url)
     end)
