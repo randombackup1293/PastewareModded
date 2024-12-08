@@ -1226,7 +1226,7 @@ end
 
 local function vapeGithubRequest(scripturl)
 	if not isfile("vape/"..scripturl) then
-		local suc, res = pcall(function() return game:HttpGet("https://raw.githubusercontent.com/randombackup1293/PastewareModded/"..readfile("vape/commithash.txt").."/"..scripturl, true) end)
+		local suc, res = pcall(function() return game:HttpGet("https://raw.githubusercontent.com/randombackup1293/PastewareModded2/"..readfile("vape/commithash.txt").."/"..scripturl, true) end)
 		assert(suc, res)
 		assert(res ~= "404: Not Found", res)
 		if scripturl:find(".lua") then res = "--This watermark is used to delete the file if its cached, remove it to make the file persist after commits.\n"..res end
@@ -8567,6 +8567,7 @@ run(function()
 	local ChestStealerOpen = {Enabled = false}
 	local ChestStealerSkywars = {Enabled = true}
 	local doneChests = {}
+	local cheststealerdelays = {}
 	local chests = {}
 	local cheststealerfuncs = {
 		Open = function()
@@ -8577,9 +8578,10 @@ run(function()
 				local chestitems = chest and chest.Value and chest.Value:GetChildren() or {}
 				if #chestitems > 0 then
 					for i3,v3 in pairs(chestitems) do
-						if v3:IsA("Accessory") then
+						if v3:IsA("Accessory") and (cheststealerdelays[v3] == nil or cheststealerdelays[v3] < tick()) then
 							task.spawn(function()
 								pcall(function()
+									cheststealerdelays[v3] = tick() + 0.2
 									bedwars.Client:GetNamespace("Inventory"):Get("ChestGetItem"):InvokeServer(chest.Value, v3)
 								end)
 							end)
@@ -8600,9 +8602,10 @@ run(function()
 						bedwars.Client:GetNamespace("Inventory"):Get("SetObservedChest"):FireServer(chest)
 						for i3,v3 in pairs(chestitems) do
 							task.wait(0.1)
-							if v3:IsA("Accessory") then
+							if v3:IsA("Accessory") and (cheststealerdelays[v3] == nil or cheststealerdelays[v3] < tick()) then
 								task.spawn(function()
 									pcall(function()
+										cheststealerdelays[v3] = tick() + 0.2
 										bedwars.Client:GetNamespace("Inventory"):Get("ChestGetItem"):InvokeServer(v.ChestFolderValue.Value, v3)
 									end)
 								end)
