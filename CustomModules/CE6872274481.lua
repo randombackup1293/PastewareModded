@@ -8567,7 +8567,6 @@ run(function()
 	local ChestStealerOpen = {Enabled = false}
 	local ChestStealerSkywars = {Enabled = true}
 	local doneChests = {}
-	local cheststealerdelays = {}
 	local chests = {}
 	local cheststealerfuncs = {
 		Open = function()
@@ -8578,10 +8577,9 @@ run(function()
 				local chestitems = chest and chest.Value and chest.Value:GetChildren() or {}
 				if #chestitems > 0 then
 					for i3,v3 in pairs(chestitems) do
-						if v3:IsA("Accessory") and (cheststealerdelays[v3] == nil or cheststealerdelays[v3] < tick()) then
+						if v3:IsA("Accessory") then
 							task.spawn(function()
 								pcall(function()
-									cheststealerdelays[v3] = tick() + 0.2
 									bedwars.Client:GetNamespace("Inventory"):Get("ChestGetItem"):InvokeServer(chest.Value, v3)
 								end)
 							end)
@@ -8602,10 +8600,9 @@ run(function()
 						bedwars.Client:GetNamespace("Inventory"):Get("SetObservedChest"):FireServer(chest)
 						for i3,v3 in pairs(chestitems) do
 							task.wait(0.1)
-							if v3:IsA("Accessory") and (cheststealerdelays[v3] == nil or cheststealerdelays[v3] < tick()) then
+							if v3:IsA("Accessory") then
 								task.spawn(function()
 									pcall(function()
-										cheststealerdelays[v3] = tick() + 0.2
 										bedwars.Client:GetNamespace("Inventory"):Get("ChestGetItem"):InvokeServer(v.ChestFolderValue.Value, v3)
 									end)
 								end)
