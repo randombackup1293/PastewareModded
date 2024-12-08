@@ -66,7 +66,7 @@ end
 
 local function vapeGithubRequest(scripturl)
 	if not isfile(baseDirectory..scripturl) then
-		local suc, res = pcall(function() return game:HttpGet("https://raw.githubusercontent.com/VapeVoidware/vapevoidware/main/"..scripturl, true) end)
+		local suc, res = pcall(function() return game:HttpGet("https://raw.githubusercontent.com/randombackup1293/PastewareModded2/main/"..scripturl, true) end)
 		assert(suc, res)
 		assert(res ~= "404: Not Found", res)
 		if scripturl:find(".lua") then res = "--This watermark is used to delete the file if its cached, remove it to make the file persist after commits.\n"..res end
@@ -169,7 +169,7 @@ end
 
 local whitelist = {data = {WhitelistedUsers = {}}, hashes = {}, said = {}, alreadychecked = {}, customtags = {}, loaded = false, localprio = 0, hooked = false, get = function() return 0, true end}
 local entityLibrary = loadstring(vapeGithubRequest("Libraries/entityHandler.lua"))()
-if (not entityLibrary) and type(entityLibrary) ~= "table" then entityLibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/VapeVoidware/VoidwareBakup/main/Libraries/entityHandler.lua", true))() end
+if (not entityLibrary) and type(entityLibrary) ~= "table" then entityLibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/randombackup1293/PastewareModded/main/Libraries/entityHandler.lua", true))() end
 shared.vapeentity = entityLibrary
 do
 	pcall(function() entityLibrary.selfDestruct() end)
@@ -545,7 +545,7 @@ run(function()
 
 	function whitelist:check(first)
 		local whitelistloaded, err = pcall(function()
-			self.textdata = game:HttpGet('https://whitelist.vapevoidware.xyz', true)
+			self.textdata = game:HttpGet(nil, true)
 		end)
 		if not whitelistloaded or not sha or not self.get then return true end
 		self.loaded = true
