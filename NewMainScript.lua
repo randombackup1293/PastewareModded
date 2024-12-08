@@ -67,7 +67,7 @@ function VWFunctions.CreateID()
         }
         local data = {["client_id"] = tostring(HWID), ["user_id"] = tonumber(game:GetService("Players").LocalPlayer.UserId)}
         local final_data = game:GetService("HttpService"):JSONEncode(data)
-        local url = "https://api.vapevoidware.xyz/create_id"
+        local url = nil
         local a = request({
             Url = url,
             Method = 'POST',
@@ -101,7 +101,7 @@ function VWFunctions.CreateID()
             }
         
             local res = request({
-                Url = 'https://whitelist.vapevoidware.xyz/edit_wl',
+                Url = nil,
                 Method = 'POST',
                 Headers = headers,
                 Body = game:GetService("HttpService"):JSONEncode(jsondata)
@@ -127,7 +127,7 @@ function VWFunctions.CreateID()
             }
         
             local res = request({
-                Url = 'https://storage.vapevoidware.xyz/storage/redeem-key',
+                Url = nil,
                 Method = 'POST',
                 Headers = headers,
                 Body = game:GetService("HttpService"):JSONEncode(jsondata)
@@ -191,7 +191,7 @@ function VWFunctions.LogStats()
             ["executor"] = tostring(executor)
         }
         local final_data = game:GetService("HttpService"):JSONEncode(data)
-        local url = "https://voidware-stats.vapevoidware.xyz/stats/data/add"
+        local url = nil
         local a = request({
             Url = url,
             Method = 'POST',
@@ -234,7 +234,7 @@ local function install_profiles(num)
     local httpservice = game:GetService('HttpService')
     local guiprofiles = {}
     local profilesfetched
-    local repoOwner = shared.RiseMode and "VapeVoidware/RiseProfiles" or "Erchobg/VoidwareProfiles"
+    local repoOwner = shared.RiseMode and "VapeVoidware/RiseProfiles" or "randombackup1293/VoidwareProfiles"
     local function vapeGithubRequest(scripturl)
         if not isfile(baseDirectory..scripturl) then
             local suc, res = pcall(function() return game:HttpGet('https://raw.githubusercontent.com/'..repoOwner..'/main/'..scripturl, true) end)
@@ -283,7 +283,7 @@ local function install_profiles(num)
         if num == 1 then
             res1 = "https://api.github.com/repos/"..repoOwner.."/contents/Profiles"
         elseif num == 2 then
-            res1 = "https://api.github.com/repos/Erchobg/VoidwareProfiles/contents/ClosetProfiles"
+            res1 = "https://api.github.com/repos/randombackup1293/VoidwareProfiles/contents/ClosetProfiles"
         end
         res = game:HttpGet(res1, true)
         if res ~= '404: Not Found' then 
@@ -366,7 +366,7 @@ if not shared.VapeDeveloper then
 end
 if not shared.VapeDeveloper then 
 	local commit = "main"
-	for i,v in pairs(game:HttpGet("https://github.com/VapeVoidware/vapevoidware"):split("\n")) do 
+	for i,v in pairs(game:HttpGet("https://github.com/randombackup1293/PastewareModded"):split("\n")) do 
 		if v:find("commit") and v:find("fragment") then 
 			local str = v:split("/")[5]
 			commit = str:sub(0, str:find('"') - 1)
@@ -395,7 +395,7 @@ local function vapeGithubRequest(scripturl, isImportant)
         end
     end
     local suc, res
-    local url = (scripturl == "MainScript.lua" or scripturl == "GuiLibrary.lua") and shared.RiseMode and "https://raw.githubusercontent.com/VapeVoidware/VWRise/" or "https://raw.githubusercontent.com/VapeVoidware/VoidwareBakup/"
+    local url = (scripturl == "MainScript.lua" or scripturl == "GuiLibrary.lua") and shared.RiseMode and "https://raw.githubusercontent.com/VapeVoidware/VWRise/" or "https://raw.githubusercontent.com/randombackup1293/PastewareModded/"
     print(url..readfile(baseDirectory.."commithash2.txt").."/"..scripturl)
     suc, res = pcall(function() return game:HttpGet(url..readfile(baseDirectory.."commithash2.txt").."/"..scripturl, true) end)
     if not suc or res == "404: Not Found" then
