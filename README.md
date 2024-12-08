@@ -1,2 +1,1 @@
-Pro script
-discord.gg/voidware
+Voidware without the bloat! Enjoy!
