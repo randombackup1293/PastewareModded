@@ -1544,7 +1544,7 @@ shared.zephyrActive = false
 shared.scytheActive = false
 shared.scytheSpeed = 5
 local function getSpeed(reduce)
-	local speed = 1
+	local speed = 0
 	if lplr.Character then
 		local SpeedDamageBoost = lplr.Character:GetAttribute("SpeedBoost")
 		if SpeedDamageBoost and SpeedDamageBoost > 1 then
