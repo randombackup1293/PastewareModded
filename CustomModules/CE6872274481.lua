@@ -4658,7 +4658,7 @@ bedwars.ProjectileMeta = decode(VoidwareFunctions.fetchCheatEngineSupportFile("P
 	local damagemethods = {
 		fireball = function(fireball, pos)
 			if not LongJump.Enabled then return end
-			pos = pos - (entityLibrary.character.HumanoidRootPart.CFrame.lookVector * 0.2)
+			pos = pos - (lplr.character.HumanoidRootPart.CFrame.lookVector * 0.2)
 			if not (getPlacedBlock(pos - Vector3.new(0, 3, 0)) or getPlacedBlock(pos - Vector3.new(0, 6, 0))) then
 				local sound = Instance.new("Sound")
 				sound.SoundId = "rbxassetid://4809574295"
