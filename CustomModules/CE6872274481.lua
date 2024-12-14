@@ -4668,6 +4668,7 @@ bedwars.ProjectileMeta = decode(VoidwareFunctions.fetchCheatEngineSupportFile("P
 				end)
 				sound:Play()
 			end
+			print(getBowConstants)
 			local origpos = pos
 			local offsetshootpos = (CFrame.new(pos, pos + Vector3.new(0, -60, 0)) * CFrame.new(Vector3.new(-getBowConstants().RelX, -getBowConstants().RelY, -getBowConstants().RelZ))).p
 			local ray = game.Workspace:Raycast(pos, Vector3.new(0, -30, 0), store.blockRaycast)
