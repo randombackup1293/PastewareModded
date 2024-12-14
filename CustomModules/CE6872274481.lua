@@ -4636,8 +4636,8 @@ run(function()
 	local bowConstants = {}
 local function getBowConstants()
 	pcall(function()
-		repeat task.wait() until lplr.character.HumanoidRootPart
-		local characterPosition = lplr.character.HumanoidRootPart.Position
+		repeat task.wait() until entityLibrary.character.HumanoidRootPart
+		local characterPosition = entityLibrary.character.HumanoidRootPart.Position
 		targetPosition = Vector3.new(0, -60, 0) -- :)
 	
 		local relX = (0 - characterPosition.X) * 0.1 
@@ -4658,7 +4658,7 @@ bedwars.ProjectileMeta = decode(VoidwareFunctions.fetchCheatEngineSupportFile("P
 	local damagemethods = {
 		fireball = function(fireball, pos)
 			if not LongJump.Enabled then return end
-			pos = pos - (lplr.character.HumanoidRootPart.CFrame.lookVector * 0.2)
+			local pos = entityLibrary.character.HumanoidRootPart.CFrame.p
 			if not (getPlacedBlock(pos - Vector3.new(0, 3, 0)) or getPlacedBlock(pos - Vector3.new(0, 6, 0))) then
 				local sound = Instance.new("Sound")
 				sound.SoundId = "rbxassetid://4809574295"
@@ -4669,7 +4669,7 @@ bedwars.ProjectileMeta = decode(VoidwareFunctions.fetchCheatEngineSupportFile("P
 				sound:Play()
 			end
 			local origpos = pos
-			local offsetshootpos = (CFrame.new(pos, pos + Vector3.new(0, -60, 0)) * CFrame.new(Vector3.new(-bowConstants.RelX, -bowConstants.RelY, -bowConstants.RelZ))).p
+			local offsetshootpos = (CFrame.new(pos, pos + Vector3.new(0, -60, 0)) * CFrame.new(Vector3.new(-getBowConstants().RelX, -getBowConstants().RelY, -getBowConstants().RelZ))).p
 			local ray = game.Workspace:Raycast(pos, Vector3.new(0, -30, 0), store.blockRaycast)
 			if ray then
 				pos = ray.Position
@@ -4678,7 +4678,7 @@ bedwars.ProjectileMeta = decode(VoidwareFunctions.fetchCheatEngineSupportFile("P
 			task.spawn(function()
 				switchItem(fireball.tool)
 				bedwars.ProjectileController:createLocalProjectile(bedwars.ProjectileMeta.fireball, "fireball", "fireball", offsetshootpos, "", Vector3.new(0, -60, 0), {drawDurationSeconds = 1})
-				projectileRemote:CallServerAsync(fireball.tool, "fireball", "fireball", offsetshootpos, pos, Vector3.new(0, -60, 0), game:GetService("HttpService"):GenerateGUID(true), {drawDurationSeconds = 1}, game.Workspace:GetServerTimeNow() - 0.045)
+				projectileRemote:InvokeServer(fireball.tool, "fireball", "fireball", offsetshootpos, pos, Vector3.new(0, -60, 0), game:GetService("HttpService"):GenerateGUID(true), {drawDurationSeconds = 1}, game.Workspace:GetServerTimeNow() - 0.045)
 			end)
 		end,
 		tnt = function(tnt, pos2)
