@@ -3558,78 +3558,6 @@ run(function()
 	})
 end)
 
---[[run(function()
-	local GrappleExploit = {Enabled = false}
-	local GrappleExploitMode = {Value = "Normal"}
-	local GrappleExploitVerticalSpeed = {Value = 40}
-	local GrappleExploitVertical = {Enabled = true}
-	local GrappleExploitUp = false
-	local GrappleExploitDown = false
-	local alternatelist = {"Normal", "AntiCheat A", "AntiCheat B"}
-	local projectileRemote = bedwars.Client:Get(bedwars.ProjectileRemote)
-
-	--me when I have to fix bw code omegalol
-	bedwars.Client:Get("GrapplingHookFunctions").OnClientEvent:Connect(function(p4)
-		if p4.hookFunction == "PLAYER_IN_TRANSIT" then
-			bedwars.CooldownController:setOnCooldown("grappling_hook", 3.5)
-		end
-	end)
-
-	GrappleExploit = GuiLibrary.ObjectsThatCanBeSaved.BlatantWindow.Api.CreateOptionsButton({
-		Name = "GrappleExploit",
-		Function = function(callback)
-			if callback then
-				local grappleHooked = false
-				table.insert(GrappleExploit.Connections, bedwars.Client:Get("GrapplingHookFunctions").OnClientEvent:Connect(function(p4)
-					if p4.hookFunction == "PLAYER_IN_TRANSIT" then
-						store.grapple = tick() + 1.8
-						grappleHooked = true
-						GrappleExploit.ToggleButton(false)
-					end
-				end))
-
-				local fireball = getItem("grappling_hook")
-				if fireball then
-					task.spawn(function()
-						repeat task.wait() until bedwars.CooldownController:getRemainingCooldown("grappling_hook") == 0 or (not GrappleExploit.Enabled)
-						if (not GrappleExploit.Enabled) then return end
-						switchItem(fireball.tool)
-						local pos = entityLibrary.character.HumanoidRootPart.CFrame.p
-						local offsetshootpos = (CFrame.new(pos, pos + Vector3.new(0, -60, 0)) * CFrame.new(Vector3.new(-bedwars.BowConstantsTable.RelX, -bedwars.BowConstantsTable.RelY, -bedwars.BowConstantsTable.RelZ))).p
-						projectileRemote:InvokeServer(fireball["tool"], nil, "grappling_hook_projectile", offsetshootpos, pos, Vector3.new(0, -60, 0), game:GetService("HttpService"):GenerateGUID(true), {drawDurationSeconds = 1}, game.Workspace:GetServerTimeNow() - 0.045)
-					end)
-				else
-					warningNotification("GrappleExploit", "missing grapple hook", 3)
-					GrappleExploit.ToggleButton(false)
-					return
-				end
-
-				local startCFrame = entityLibrary.isAlive and entityLibrary.character.HumanoidRootPart.CFrame
-				RunLoops:BindToHeartbeat("GrappleExploit", function(delta)
-					if GuiLibrary.ObjectsThatCanBeSaved["Lobby CheckToggle"].Api.Enabled then
-						if store.matchState == 0 then return end
-					end
-					if entityLibrary.isAlive then
-						entityLibrary.character.HumanoidRootPart.Velocity = Vector3.zero
-						entityLibrary.character.HumanoidRootPart.CFrame = startCFrame
-					end
-				end)
-			else
-				GrappleExploitUp = false
-				GrappleExploitDown = false
-				RunLoops:UnbindFromHeartbeat("GrappleExploit")
-			end
-		end,
-		HoverText = "Makes you go zoom (longer GrappleExploit discovered by exelys and Cqded)",
-		ExtraText = function()
-			if GuiLibrary.ObjectsThatCanBeSaved["Text GUIAlternate TextToggle"]["Api"].Enabled then
-				return alternatelist[table.find(GrappleExploitMode["List"], GrappleExploitMode.Value)]
-			end
-			return GrappleExploitMode.Value
-		end
-	})
-end)--]]
-
 run(function()
 	local InfiniteFly = {Enabled = false}
 	local InfiniteFlyMode = {Value = "CFrame"}
@@ -4706,7 +4634,7 @@ run(function()
 	end
 
 	local damagemethods = {
-		--[[fireball = function(fireball, pos)
+		fireball = function(fireball, pos)
 			if not LongJump.Enabled then return end
 			pos = pos - (entityLibrary.character.HumanoidRootPart.CFrame.lookVector * 0.2)
 			if not (getPlacedBlock(pos - Vector3.new(0, 3, 0)) or getPlacedBlock(pos - Vector3.new(0, 6, 0))) then
@@ -4730,7 +4658,7 @@ run(function()
 				bedwars.ProjectileController:createLocalProjectile(bedwars.ProjectileMeta.fireball, "fireball", "fireball", offsetshootpos, "", Vector3.new(0, -60, 0), {drawDurationSeconds = 1})
 				projectileRemote:InvokeServer(fireball.tool, "fireball", "fireball", offsetshootpos, pos, Vector3.new(0, -60, 0), game:GetService("HttpService"):GenerateGUID(true), {drawDurationSeconds = 1}, game.Workspace:GetServerTimeNow() - 0.045)
 			end)
-		end,--]]
+		end,
 		tnt = function(tnt, pos2)
 			if not LongJump.Enabled then return end
 			local pos = Vector3.new(pos2.X, getScaffold(Vector3.new(0, pos2.Y - (((entityLibrary.character.HumanoidRootPart.Size.Y / 2) + entityLibrary.character.Humanoid.HipHeight) - 1.5), 0)).Y, pos2.Z)
