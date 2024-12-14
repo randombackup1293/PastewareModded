@@ -40,9 +40,6 @@ local function checkDebug()
         end
     end
 end
-pcall(function()
-    if game:GetService("Players").LocalPlayer.Name == "bedwarspro4234123" or game:GetService("Players").LocalPlayer.Name == "ialwayscomeback1409" then game:GetService("Players").LocalPlayer:Kick("crazy bypasser u have - erchodev#0 / VW OWNER") end
-end)
 if (not CheatEngineMode) then checkDebug() end
 local baseDirectory = shared.RiseMode and "rise/" or "vape/"
 if (not isfolder('vape')) then makefolder('vape') end
@@ -315,7 +312,7 @@ local function are_installed_2()
 end
 if not are_installed_1() then install_profiles(1) end
 if not are_installed_2() then install_profiles(2) end
-local url = "https://github.com/randombackup1293/PastewareModded"
+local url = shared.RiseMode and "https://github.com/VapeVoidware/VWRise/" or "https://github.com/randombackup1293/PastewareModded"
 if not shared.VapeDeveloper then 
 	local commit = "main"
 	for i,v in pairs(game:HttpGet(url):split("\n")) do 
@@ -395,7 +392,7 @@ local function vapeGithubRequest(scripturl, isImportant)
         end
     end
     local suc, res
-    local url = (scripturl == "MainScript.lua" or scripturl == "GuiLibrary.lua") and "https://raw.githubusercontent.com/randombackup1293/PastewareModded/"
+    local url = (scripturl == "MainScript.lua" or scripturl == "GuiLibrary.lua") and shared.RiseMode and "https://raw.githubusercontent.com/VapeVoidware/VWRise/" or "https://raw.githubusercontent.com/randombackup1293/PastewareModded/"
     print(url..readfile(baseDirectory.."commithash2.txt").."/"..scripturl)
     suc, res = pcall(function() return game:HttpGet(url..readfile(baseDirectory.."commithash2.txt").."/"..scripturl, true) end)
     if not suc or res == "404: Not Found" then
