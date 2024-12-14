@@ -3648,7 +3648,7 @@ run(function()
 	local FlyOverlap = OverlapParams.new()
 	FlyOverlap.MaxParts = 9e9
 	FlyOverlap.FilterDescendantsInstances = {}
-	FlyOverlap.RespectCanCollide = false
+	FlyOverlap.RespectCanCollide = true
 
 	local function disablefunc()
 		if bodyvelo then bodyvelo:Destroy() end
@@ -3831,8 +3831,8 @@ run(function()
 					entityLibrary.character.Humanoid:ChangeState(Enum.HumanoidStateType.Landed)
 					disabledproper = false
 					if isnetworkowner(oldcloneroot) then
-						warningNotification("InfiniteFly", "Waiting 1.1s to not flag", 3)
-						task.delay(1.1, disablefunc)
+						warningNotification("InfiniteFly", "Waiting 1.5s to not flag", 3)
+						task.delay(1.5, disablefunc)
 					else
 						disablefunc()
 					end
