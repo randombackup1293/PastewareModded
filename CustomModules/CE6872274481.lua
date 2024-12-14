@@ -893,7 +893,7 @@ bedwars.ShopItems = bedwars.ShopItemsMeta.ShopItems
 local bowConstants = {}
 local function getBowConstants()
 	pcall(function()
-		repeat task.wait() until entityLibrary.character.HumanoidRootPart
+		repeat task.wait() until lplr.character.HumanoidRootPart
 		local characterPosition = lplr.character.HumanoidRootPart.Position
 		targetPosition = Vector3.new(0, -60, 0) -- :)
 	
@@ -4636,8 +4636,8 @@ run(function()
 	local bowConstants = {}
 local function getBowConstants()
 	pcall(function()
-		repeat task.wait() until entityLibrary.character.HumanoidRootPart
-		local characterPosition = entityLibrary.character.HumanoidRootPart.Position
+		repeat task.wait() until lplr.character.HumanoidRootPart
+		local characterPosition = lplr.character.HumanoidRootPart.Position
 		targetPosition = Vector3.new(0, -60, 0) -- :)
 	
 		local relX = (0 - characterPosition.X) * 0.1 
