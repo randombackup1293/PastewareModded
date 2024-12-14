@@ -3558,6 +3558,78 @@ run(function()
 	})
 end)
 
+--[[run(function()
+	local GrappleExploit = {Enabled = false}
+	local GrappleExploitMode = {Value = "Normal"}
+	local GrappleExploitVerticalSpeed = {Value = 40}
+	local GrappleExploitVertical = {Enabled = true}
+	local GrappleExploitUp = false
+	local GrappleExploitDown = false
+	local alternatelist = {"Normal", "AntiCheat A", "AntiCheat B"}
+	local projectileRemote = bedwars.Client:Get(bedwars.ProjectileRemote)
+
+	--me when I have to fix bw code omegalol
+	bedwars.Client:Get("GrapplingHookFunctions").OnClientEvent:Connect(function(p4)
+		if p4.hookFunction == "PLAYER_IN_TRANSIT" then
+			bedwars.CooldownController:setOnCooldown("grappling_hook", 3.5)
+		end
+	end)
+
+	GrappleExploit = GuiLibrary.ObjectsThatCanBeSaved.BlatantWindow.Api.CreateOptionsButton({
+		Name = "GrappleExploit",
+		Function = function(callback)
+			if callback then
+				local grappleHooked = false
+				table.insert(GrappleExploit.Connections, bedwars.Client:Get("GrapplingHookFunctions").OnClientEvent:Connect(function(p4)
+					if p4.hookFunction == "PLAYER_IN_TRANSIT" then
+						store.grapple = tick() + 1.8
+						grappleHooked = true
+						GrappleExploit.ToggleButton(false)
+					end
+				end))
+
+				local fireball = getItem("grappling_hook")
+				if fireball then
+					task.spawn(function()
+						repeat task.wait() until bedwars.CooldownController:getRemainingCooldown("grappling_hook") == 0 or (not GrappleExploit.Enabled)
+						if (not GrappleExploit.Enabled) then return end
+						switchItem(fireball.tool)
+						local pos = entityLibrary.character.HumanoidRootPart.CFrame.p
+						local offsetshootpos = (CFrame.new(pos, pos + Vector3.new(0, -60, 0)) * CFrame.new(Vector3.new(-bedwars.BowConstantsTable.RelX, -bedwars.BowConstantsTable.RelY, -bedwars.BowConstantsTable.RelZ))).p
+						projectileRemote:InvokeServer(fireball["tool"], nil, "grappling_hook_projectile", offsetshootpos, pos, Vector3.new(0, -60, 0), game:GetService("HttpService"):GenerateGUID(true), {drawDurationSeconds = 1}, game.Workspace:GetServerTimeNow() - 0.045)
+					end)
+				else
+					warningNotification("GrappleExploit", "missing grapple hook", 3)
+					GrappleExploit.ToggleButton(false)
+					return
+				end
+
+				local startCFrame = entityLibrary.isAlive and entityLibrary.character.HumanoidRootPart.CFrame
+				RunLoops:BindToHeartbeat("GrappleExploit", function(delta)
+					if GuiLibrary.ObjectsThatCanBeSaved["Lobby CheckToggle"].Api.Enabled then
+						if store.matchState == 0 then return end
+					end
+					if entityLibrary.isAlive then
+						entityLibrary.character.HumanoidRootPart.Velocity = Vector3.zero
+						entityLibrary.character.HumanoidRootPart.CFrame = startCFrame
+					end
+				end)
+			else
+				GrappleExploitUp = false
+				GrappleExploitDown = false
+				RunLoops:UnbindFromHeartbeat("GrappleExploit")
+			end
+		end,
+		HoverText = "Makes you go zoom (longer GrappleExploit discovered by exelys and Cqded)",
+		ExtraText = function()
+			if GuiLibrary.ObjectsThatCanBeSaved["Text GUIAlternate TextToggle"]["Api"].Enabled then
+				return alternatelist[table.find(GrappleExploitMode["List"], GrappleExploitMode.Value)]
+			end
+			return GrappleExploitMode.Value
+		end
+	})
+end)--]]
+
 run(function()
 	local InfiniteFly = {Enabled = false}
 	local InfiniteFlyMode = {Value = "CFrame"}
@@ -4616,6 +4688,298 @@ run(function()
 	killauranovape.Object.Visible = false
 end)
 
+local LongJump = {Enabled = false}
+run(function()
+	local damagetimer = 0
+	local damagetimertick = 0
+	local directionvec
+	local LongJumpSpeed = {Value = 1.5}
+	local projectileRemote = bedwars.Client:Get(bedwars.ProjectileRemote)
+
+	local function calculatepos(vec)
+		local returned = vec
+		if entityLibrary.isAlive then
+			local newray = game.Workspace:Raycast(entityLibrary.character.HumanoidRootPart.Position, returned, store.blockRaycast)
+			if newray then returned = (newray.Position - entityLibrary.character.HumanoidRootPart.Position) end
+		end
+		return returned
+	end
+
+	local damagemethods = {
+		--[[fireball = function(fireball, pos)
+			if not LongJump.Enabled then return end
+			pos = pos - (entityLibrary.character.HumanoidRootPart.CFrame.lookVector * 0.2)
+			if not (getPlacedBlock(pos - Vector3.new(0, 3, 0)) or getPlacedBlock(pos - Vector3.new(0, 6, 0))) then
+				local sound = Instance.new("Sound")
+				sound.SoundId = "rbxassetid://4809574295"
+				sound.Parent = game.Workspace
+				sound.Ended:Connect(function()
+					sound:Destroy()
+				end)
+				sound:Play()
+			end
+			local origpos = pos
+			local offsetshootpos = (CFrame.new(pos, pos + Vector3.new(0, -60, 0)) * CFrame.new(Vector3.new(-bedwars.BowConstantsTable.RelX, -bedwars.BowConstantsTable.RelY, -bedwars.BowConstantsTable.RelZ))).p
+			local ray = game.Workspace:Raycast(pos, Vector3.new(0, -30, 0), store.blockRaycast)
+			if ray then
+				pos = ray.Position
+				offsetshootpos = pos
+			end
+			task.spawn(function()
+				switchItem(fireball.tool)
+				bedwars.ProjectileController:createLocalProjectile(bedwars.ProjectileMeta.fireball, "fireball", "fireball", offsetshootpos, "", Vector3.new(0, -60, 0), {drawDurationSeconds = 1})
+				projectileRemote:InvokeServer(fireball.tool, "fireball", "fireball", offsetshootpos, pos, Vector3.new(0, -60, 0), game:GetService("HttpService"):GenerateGUID(true), {drawDurationSeconds = 1}, game.Workspace:GetServerTimeNow() - 0.045)
+			end)
+		end,--]]
+		tnt = function(tnt, pos2)
+			if not LongJump.Enabled then return end
+			local pos = Vector3.new(pos2.X, getScaffold(Vector3.new(0, pos2.Y - (((entityLibrary.character.HumanoidRootPart.Size.Y / 2) + entityLibrary.character.Humanoid.HipHeight) - 1.5), 0)).Y, pos2.Z)
+			local block = bedwars.placeBlock(pos, "tnt")
+		end,
+		cannon = function(tnt, pos2)
+			task.spawn(function()
+				local pos = Vector3.new(pos2.X, getScaffold(Vector3.new(0, pos2.Y - (((entityLibrary.character.HumanoidRootPart.Size.Y / 2) + entityLibrary.character.Humanoid.HipHeight) - 1.5), 0)).Y, pos2.Z)
+				local block = bedwars.placeBlock(pos, "cannon")
+				task.delay(0.1, function()
+					local block, pos2 = getPlacedBlock(pos)
+					if block and block.Name == "cannon" and (entityLibrary.character.HumanoidRootPart.CFrame.p - block.Position).Magnitude < 20 then
+						switchToAndUseTool(block)
+						local vec = entityLibrary.character.HumanoidRootPart.CFrame.lookVector
+						local damage = bedwars.BlockController:calculateBlockDamage(lplr, {
+							blockPosition = pos2,
+							block = block
+						})
+						bedwars.Client:Get(bedwars.CannonAimRemote):FireServer({
+							cannonBlockPos = pos2,
+							lookVector = vec
+						})
+						local broken = 0.1
+						if damage < block:GetAttribute("Health") then
+							task.spawn(function()
+								broken = 0.4
+								bedwars.breakBlock(block)
+							end)
+						end
+						task.delay(broken, function()
+							for i = 1, 3 do
+								local call = bedwars.Client:Get(bedwars.CannonLaunchRemote):InvokeServer({cannonBlockPos = bedwars.BlockController:getBlockPosition(block)})
+								if call then
+									bedwars.breakBlock(block)
+									task.delay(0.1, function()
+										damagetimer = LongJumpSpeed.Value * 5
+										damagetimertick = tick() + 2.5
+										directionvec = Vector3.new(vec.X, 0, vec.Z).Unit
+									end)
+									break
+								end
+								task.wait(0.1)
+							end
+						end)
+					end
+				end)
+			end)
+		end,
+		wood_dao = function(tnt, pos2)
+			task.spawn(function()
+				switchItem(tnt.tool)
+				if not (not lplr.Character:GetAttribute("CanDashNext") or lplr.Character:GetAttribute("CanDashNext") < game.Workspace:GetServerTimeNow()) then
+					repeat task.wait() until (not lplr.Character:GetAttribute("CanDashNext") or lplr.Character:GetAttribute("CanDashNext") < game.Workspace:GetServerTimeNow()) or not LongJump.Enabled
+				end
+				if LongJump.Enabled then
+					local vec = entityLibrary.character.HumanoidRootPart.CFrame.lookVector
+					replicatedStorage["events-@easy-games/game-core:shared/game-core-networking@getEvents.Events"].useAbility:FireServer("dash", {
+						direction = vec,
+						origin = entityLibrary.character.HumanoidRootPart.CFrame.p,
+						weapon = tnt.itemType
+					})
+					damagetimer = LongJumpSpeed.Value * 3.5
+					damagetimertick = tick() + 2.5
+					directionvec = Vector3.new(vec.X, 0, vec.Z).Unit
+				end
+			end)
+		end,
+		jade_hammer = function(tnt, pos2)
+			task.spawn(function()
+				if not bedwars.AbilityController:canUseAbility("jade_hammer_jump") then
+					repeat task.wait() until bedwars.AbilityController:canUseAbility("jade_hammer_jump") or not LongJump.Enabled
+					task.wait(0.1)
+				end
+				if bedwars.AbilityController:canUseAbility("jade_hammer_jump") and LongJump.Enabled then
+					bedwars.AbilityController:useAbility("jade_hammer_jump")
+					local vec = entityLibrary.character.HumanoidRootPart.CFrame.lookVector
+					damagetimer = LongJumpSpeed.Value * 2.75
+					damagetimertick = tick() + 2.5
+					directionvec = Vector3.new(vec.X, 0, vec.Z).Unit
+				end
+			end)
+		end,
+		void_axe = function(tnt, pos2)
+			task.spawn(function()
+				if not bedwars.AbilityController:canUseAbility("void_axe_jump") then
+					repeat task.wait() until bedwars.AbilityController:canUseAbility("void_axe_jump") or not LongJump.Enabled
+					task.wait(0.1)
+				end
+				if bedwars.AbilityController:canUseAbility("void_axe_jump") and LongJump.Enabled then
+					bedwars.AbilityController:useAbility("void_axe_jump")
+					local vec = entityLibrary.character.HumanoidRootPart.CFrame.lookVector
+					damagetimer = LongJumpSpeed.Value * 2.75
+					damagetimertick = tick() + 2.5
+					directionvec = Vector3.new(vec.X, 0, vec.Z).Unit
+				end
+			end)
+		end
+	}
+	damagemethods.stone_dao = damagemethods.wood_dao
+	damagemethods.iron_dao = damagemethods.wood_dao
+	damagemethods.diamond_dao = damagemethods.wood_dao
+	damagemethods.emerald_dao = damagemethods.wood_dao
+
+	local oldgrav
+	local LongJumpacprogressbarframe = Instance.new("Frame")
+	LongJumpacprogressbarframe.AnchorPoint = Vector2.new(0.5, 0)
+	LongJumpacprogressbarframe.Position = UDim2.new(0.5, 0, 1, -200)
+	LongJumpacprogressbarframe.Size = UDim2.new(0.2, 0, 0, 20)
+	LongJumpacprogressbarframe.BackgroundTransparency = 0.5
+	LongJumpacprogressbarframe.BorderSizePixel = 0
+	LongJumpacprogressbarframe.BackgroundColor3 = Color3.fromHSV(GuiLibrary.ObjectsThatCanBeSaved["Gui ColorSliderColor"].Api.Hue, GuiLibrary.ObjectsThatCanBeSaved["Gui ColorSliderColor"].Api.Sat, GuiLibrary.ObjectsThatCanBeSaved["Gui ColorSliderColor"].Api.Value)
+	LongJumpacprogressbarframe.Visible = LongJump.Enabled
+	LongJumpacprogressbarframe.Parent = GuiLibrary.MainGui
+	local LongJumpacprogressbarframe2 = LongJumpacprogressbarframe:Clone()
+	LongJumpacprogressbarframe2.AnchorPoint = Vector2.new(0, 0)
+	LongJumpacprogressbarframe2.Position = UDim2.new(0, 0, 0, 0)
+	LongJumpacprogressbarframe2.Size = UDim2.new(1, 0, 0, 20)
+	LongJumpacprogressbarframe2.BackgroundTransparency = 0
+	LongJumpacprogressbarframe2.Visible = true
+	LongJumpacprogressbarframe2.BackgroundColor3 = Color3.fromHSV(GuiLibrary.ObjectsThatCanBeSaved["Gui ColorSliderColor"].Api.Hue, GuiLibrary.ObjectsThatCanBeSaved["Gui ColorSliderColor"].Api.Sat, GuiLibrary.ObjectsThatCanBeSaved["Gui ColorSliderColor"].Api.Value)
+	LongJumpacprogressbarframe2.Parent = LongJumpacprogressbarframe
+	local LongJumpacprogressbartext = Instance.new("TextLabel")
+	LongJumpacprogressbartext.Text = "2.5s"
+	LongJumpacprogressbartext.Font = Enum.Font.Gotham
+	LongJumpacprogressbartext.TextStrokeTransparency = 0
+	LongJumpacprogressbartext.TextColor3 =  Color3.new(0.9, 0.9, 0.9)
+	LongJumpacprogressbartext.TextSize = 20
+	LongJumpacprogressbartext.Size = UDim2.new(1, 0, 1, 0)
+	LongJumpacprogressbartext.BackgroundTransparency = 1
+	LongJumpacprogressbartext.Position = UDim2.new(0, 0, -1, 0)
+	LongJumpacprogressbartext.Parent = LongJumpacprogressbarframe
+	LongJump = GuiLibrary.ObjectsThatCanBeSaved.BlatantWindow.Api.CreateOptionsButton({
+		Name = "LongJump",
+		Function = function(callback)
+			if callback then
+				table.insert(LongJump.Connections, vapeEvents.EntityDamageEvent.Event:Connect(function(damageTable)
+					if damageTable.entityInstance == lplr.Character and (not damageTable.knockbackMultiplier or not damageTable.knockbackMultiplier.disabled) then
+						local knockbackBoost = damageTable.knockbackMultiplier and damageTable.knockbackMultiplier.horizontal and damageTable.knockbackMultiplier.horizontal * LongJumpSpeed.Value or LongJumpSpeed.Value
+						if damagetimertick < tick() or knockbackBoost >= damagetimer then
+							damagetimer = knockbackBoost
+							damagetimertick = tick() + 2.5
+							local newDirection = entityLibrary.character.HumanoidRootPart.CFrame.lookVector
+							directionvec = Vector3.new(newDirection.X, 0, newDirection.Z).Unit
+						end
+					end
+				end))
+				task.spawn(function()
+					task.spawn(function()
+						repeat
+							task.wait()
+							if LongJumpacprogressbarframe then
+								LongJumpacprogressbarframe.BackgroundColor3 = Color3.fromHSV(GuiLibrary.ObjectsThatCanBeSaved["Gui ColorSliderColor"].Api.Hue, GuiLibrary.ObjectsThatCanBeSaved["Gui ColorSliderColor"].Api.Sat, GuiLibrary.ObjectsThatCanBeSaved["Gui ColorSliderColor"].Api.Value)
+								LongJumpacprogressbarframe2.BackgroundColor3 = Color3.fromHSV(GuiLibrary.ObjectsThatCanBeSaved["Gui ColorSliderColor"].Api.Hue, GuiLibrary.ObjectsThatCanBeSaved["Gui ColorSliderColor"].Api.Sat, GuiLibrary.ObjectsThatCanBeSaved["Gui ColorSliderColor"].Api.Value)
+							end
+						until (not LongJump.Enabled)
+					end)
+					local LongJumpOrigin = entityLibrary.isAlive and entityLibrary.character.HumanoidRootPart.Position
+					local tntcheck
+					for i,v in pairs(damagemethods) do
+						local item = getItem(i)
+						if item then
+							if i == "tnt" then
+								local pos = getScaffold(LongJumpOrigin)
+								tntcheck = Vector3.new(pos.X, LongJumpOrigin.Y, pos.Z)
+								v(item, pos)
+							else
+								v(item, LongJumpOrigin)
+							end
+							break
+						end
+					end
+					local changecheck
+					LongJumpacprogressbarframe.Visible = true
+					RunLoops:BindToHeartbeat("LongJump", function(dt)
+						if entityLibrary.isAlive then
+							if entityLibrary.character.Humanoid.Health <= 0 then
+								LongJump.ToggleButton(false)
+								return
+							end
+							if not LongJumpOrigin then
+								LongJumpOrigin = entityLibrary.character.HumanoidRootPart.Position
+							end
+							local newval = damagetimer ~= 0
+							if changecheck ~= newval then
+								if newval then
+									LongJumpacprogressbarframe2:TweenSize(UDim2.new(0, 0, 0, 20), Enum.EasingDirection.InOut, Enum.EasingStyle.Linear, 2.5, true)
+								else
+									LongJumpacprogressbarframe2:TweenSize(UDim2.new(1, 0, 0, 20), Enum.EasingDirection.InOut, Enum.EasingStyle.Linear, 0, true)
+								end
+								changecheck = newval
+							end
+							if newval then
+								local newnum = math.max(math.floor((damagetimertick - tick()) * 10) / 10, 0)
+								if LongJumpacprogressbartext then
+									LongJumpacprogressbartext.Text = newnum.."s"
+								end
+								if directionvec == nil then
+									directionvec = entityLibrary.character.HumanoidRootPart.CFrame.lookVector
+								end
+								local longJumpCFrame = Vector3.new(directionvec.X, 0, directionvec.Z)
+								local newvelo = longJumpCFrame.Unit == longJumpCFrame.Unit and longJumpCFrame.Unit * (newnum > 1 and damagetimer or 20) or Vector3.zero
+								newvelo = Vector3.new(newvelo.X, 0, newvelo.Z)
+								longJumpCFrame = longJumpCFrame * (getSpeed() + 3) * dt
+								local ray = game.Workspace:Raycast(entityLibrary.character.HumanoidRootPart.Position, longJumpCFrame, store.blockRaycast)
+								if ray then
+									longJumpCFrame = Vector3.zero
+									newvelo = Vector3.zero
+								end
+
+								entityLibrary.character.HumanoidRootPart.Velocity = newvelo
+								entityLibrary.character.HumanoidRootPart.CFrame = entityLibrary.character.HumanoidRootPart.CFrame + longJumpCFrame
+							else
+								LongJumpacprogressbartext.Text = "2.5s"
+								entityLibrary.character.HumanoidRootPart.CFrame = CFrame.new(LongJumpOrigin, LongJumpOrigin + entityLibrary.character.HumanoidRootPart.CFrame.lookVector)
+								entityLibrary.character.HumanoidRootPart.Velocity = Vector3.new(0, 0, 0)
+								if tntcheck then
+									entityLibrary.character.HumanoidRootPart.CFrame = CFrame.new(tntcheck + entityLibrary.character.HumanoidRootPart.CFrame.lookVector, tntcheck + (entityLibrary.character.HumanoidRootPart.CFrame.lookVector * 2))
+								end
+							end
+						else
+							if LongJumpacprogressbartext then
+								LongJumpacprogressbartext.Text = "2.5s"
+							end
+							LongJumpOrigin = nil
+							tntcheck = nil
+						end
+					end)
+				end)
+			else
+				LongJumpacprogressbarframe.Visible = false
+				RunLoops:UnbindFromHeartbeat("LongJump")
+				directionvec = nil
+				tntcheck = nil
+				LongJumpOrigin = nil
+				damagetimer = 0
+				damagetimertick = 0
+			end
+		end,
+		HoverText = "Lets you jump farther (Not landing on same level & Spamming can lead to lagbacks)"
+	})
+	LongJumpSpeed = LongJump.CreateSlider({
+		Name = "Speed",
+		Min = 1,
+		Max = 52,
+		Function = function() end,
+		Default = 52
+	})
+end)
+
 run(function()
 	local NoFall = {Enabled = false}
 	local oldfall
@@ -4712,6 +5076,93 @@ run(function()
 	})
 end)
 
+--[[run(function()
+	local oldCalculateAim
+	local BowAimbotProjectiles = {Enabled = false}
+	local BowAimbotPart = {Value = "HumanoidRootPart"}
+	local BowAimbotFOV = {Value = 1000}
+	local BowAimbot = GuiLibrary.ObjectsThatCanBeSaved.BlatantWindow.Api.CreateOptionsButton({
+		Name = "ProjectileAimbot",
+		Function = function(callback)
+			if callback then
+				oldCalculateAim = bedwars.ProjectileController.calculateImportantLaunchValues
+				bedwars.ProjectileController.calculateImportantLaunchValues = function(self, projmeta, worldmeta, shootpospart, ...)
+					local plr = EntityNearMouse(BowAimbotFOV.Value)
+					if plr then
+						local startPos = self:getLaunchPosition(shootpospart)
+						if not startPos then
+							return oldCalculateAim(self, projmeta, worldmeta, shootpospart, ...)
+						end
+
+						if (not BowAimbotProjectiles.Enabled) and projmeta.projectile:find("arrow") == nil then
+							return oldCalculateAim(self, projmeta, worldmeta, shootpospart, ...)
+						end
+
+						local projmetatab = projmeta:getProjectileMeta()
+						local projectilePrediction = (worldmeta and projmetatab.predictionLifetimeSec or projmetatab.lifetimeSec or 3)
+						local projectileSpeed = (projmetatab.launchVelocity or 100)
+						local gravity = (projmetatab.gravitationalAcceleration or 196.2)
+						local projectileGravity = gravity * projmeta.gravityMultiplier
+						local offsetStartPos = startPos + projmeta.fromPositionOffset
+						local pos = plr.Character[BowAimbotPart.Value].Position
+						local playerGravity = game.Workspace.Gravity
+						local balloons = plr.Character:GetAttribute("InflatedBalloons")
+
+						if balloons and balloons > 0 then
+							playerGravity = (game.Workspace.Gravity * (1 - ((balloons >= 4 and 1.2 or balloons >= 3 and 1 or 0.975))))
+						end
+
+						if plr.Character.PrimaryPart:FindFirstChild("rbxassetid://8200754399") then
+							playerGravity = (game.Workspace.Gravity * 0.3)
+						end
+
+						local shootpos, shootvelo = predictGravity(pos, plr.Character.HumanoidRootPart.Velocity, (pos - offsetStartPos).Magnitude / projectileSpeed, plr, playerGravity)
+						if projmeta.projectile == "telepearl" then
+							shootpos = pos
+							shootvelo = Vector3.zero
+						end
+
+						local newlook = CFrame.new(offsetStartPos, shootpos) * CFrame.new(Vector3.new(-bedwars.BowConstantsTable.RelX, -bedwars.BowConstantsTable.RelY, 0))
+						shootpos = newlook.p + (newlook.lookVector * (offsetStartPos - shootpos).magnitude)
+						local calculated = LaunchDirection(offsetStartPos, shootpos, projectileSpeed, projectileGravity, false)
+						oldmove = plr.Character.Humanoid.MoveDirection
+						if calculated then
+							return {
+								initialVelocity = calculated,
+								positionFrom = offsetStartPos,
+								deltaT = projectilePrediction,
+								gravitationalAcceleration = projectileGravity,
+								drawDurationSeconds = 5
+							}
+						end
+					end
+					return oldCalculateAim(self, projmeta, worldmeta, shootpospart, ...)
+				end
+			else
+				bedwars.ProjectileController.calculateImportantLaunchValues = oldCalculateAim
+			end
+		end
+	})
+	BowAimbotPart = BowAimbot.CreateDropdown({
+		Name = "Part",
+		List = {"HumanoidRootPart", "Head"},
+		Function = function() end
+	})
+	BowAimbotFOV = BowAimbot.CreateSlider({
+		Name = "FOV",
+		Function = function() end,
+		Min = 1,
+		Max = 1000,
+		Default = 1000
+	})
+	BowAimbotProjectiles = BowAimbot.CreateToggle({
+		Name = "Other Projectiles",
+		Function = function() end,
+		Default = true
+	})
+end)--]]
+
+--until I find a way to make the spam switch item thing not bad I'll just get rid of it, sorry.
 local Scaffold = {Enabled = false}
 run(function()
 	local scaffoldtext = Instance.new("TextLabel")
