@@ -4633,6 +4633,28 @@ run(function()
 		return returned
 	end
 
+	local bowConstants = {}
+local function getBowConstants()
+	pcall(function()
+		repeat task.wait() until entityLibrary.character.HumanoidRootPart
+		local characterPosition = entityLibrary.character.HumanoidRootPart.Position
+		targetPosition = Vector3.new(0, -60, 0) -- :)
+	
+		local relX = (0 - characterPosition.X) * 0.1 
+		local relY = (-60 - characterPosition.Y) * 0.05
+		local relZ = (0 - characterPosition.Z) * 0.1
+	
+		return {
+			RelX = relX,
+			RelY = relY,
+			RelZ = relZ
+		}
+	end)
+end
+bowConstants = getBowConstants()
+bedwars.BowConstantsTable = bowConstants
+bedwars.ProjectileMeta = decode(VoidwareFunctions.fetchCheatEngineSupportFile("ProjectileMeta.json"))																																												
+
 	local damagemethods = {
 		fireball = function(fireball, pos)
 			if not LongJump.Enabled then return end
@@ -4647,7 +4669,7 @@ run(function()
 				sound:Play()
 			end
 			local origpos = pos
-			local offsetshootpos = (CFrame.new(pos, pos + Vector3.new(0, -60, 0)) * CFrame.new(Vector3.new(-bedwars.BowConstantsTable.RelX, -bedwars.BowConstantsTable.RelY, -bedwars.BowConstantsTable.RelZ))).p
+			local offsetshootpos = (CFrame.new(pos, pos + Vector3.new(0, -60, 0)) * CFrame.new(Vector3.new(-bowConstants.RelX, -bowConstants.RelY, -bowConstants.RelZ))).p
 			local ray = game.Workspace:Raycast(pos, Vector3.new(0, -30, 0), store.blockRaycast)
 			if ray then
 				pos = ray.Position
@@ -5004,93 +5026,6 @@ run(function()
 	})
 end)
 
---[[run(function()
-	local oldCalculateAim
-	local BowAimbotProjectiles = {Enabled = false}
-	local BowAimbotPart = {Value = "HumanoidRootPart"}
-	local BowAimbotFOV = {Value = 1000}
-	local BowAimbot = GuiLibrary.ObjectsThatCanBeSaved.BlatantWindow.Api.CreateOptionsButton({
-		Name = "ProjectileAimbot",
-		Function = function(callback)
-			if callback then
-				oldCalculateAim = bedwars.ProjectileController.calculateImportantLaunchValues
-				bedwars.ProjectileController.calculateImportantLaunchValues = function(self, projmeta, worldmeta, shootpospart, ...)
-					local plr = EntityNearMouse(BowAimbotFOV.Value)
-					if plr then
-						local startPos = self:getLaunchPosition(shootpospart)
-						if not startPos then
-							return oldCalculateAim(self, projmeta, worldmeta, shootpospart, ...)
-						end
-
-						if (not BowAimbotProjectiles.Enabled) and projmeta.projectile:find("arrow") == nil then
-							return oldCalculateAim(self, projmeta, worldmeta, shootpospart, ...)
-						end
-
-						local projmetatab = projmeta:getProjectileMeta()
-						local projectilePrediction = (worldmeta and projmetatab.predictionLifetimeSec or projmetatab.lifetimeSec or 3)
-						local projectileSpeed = (projmetatab.launchVelocity or 100)
-						local gravity = (projmetatab.gravitationalAcceleration or 196.2)
-						local projectileGravity = gravity * projmeta.gravityMultiplier
-						local offsetStartPos = startPos + projmeta.fromPositionOffset
-						local pos = plr.Character[BowAimbotPart.Value].Position
-						local playerGravity = game.Workspace.Gravity
-						local balloons = plr.Character:GetAttribute("InflatedBalloons")
-
-						if balloons and balloons > 0 then
-							playerGravity = (game.Workspace.Gravity * (1 - ((balloons >= 4 and 1.2 or balloons >= 3 and 1 or 0.975))))
-						end
-
-						if plr.Character.PrimaryPart:FindFirstChild("rbxassetid://8200754399") then
-							playerGravity = (game.Workspace.Gravity * 0.3)
-						end
-
-						local shootpos, shootvelo = predictGravity(pos, plr.Character.HumanoidRootPart.Velocity, (pos - offsetStartPos).Magnitude / projectileSpeed, plr, playerGravity)
-						if projmeta.projectile == "telepearl" then
-							shootpos = pos
-							shootvelo = Vector3.zero
-						end
-
-						local newlook = CFrame.new(offsetStartPos, shootpos) * CFrame.new(Vector3.new(-bedwars.BowConstantsTable.RelX, -bedwars.BowConstantsTable.RelY, 0))
-						shootpos = newlook.p + (newlook.lookVector * (offsetStartPos - shootpos).magnitude)
-						local calculated = LaunchDirection(offsetStartPos, shootpos, projectileSpeed, projectileGravity, false)
-						oldmove = plr.Character.Humanoid.MoveDirection
-						if calculated then
-							return {
-								initialVelocity = calculated,
-								positionFrom = offsetStartPos,
-								deltaT = projectilePrediction,
-								gravitationalAcceleration = projectileGravity,
-								drawDurationSeconds = 5
-							}
-						end
-					end
-					return oldCalculateAim(self, projmeta, worldmeta, shootpospart, ...)
-				end
-			else
-				bedwars.ProjectileController.calculateImportantLaunchValues = oldCalculateAim
-			end
-		end
-	})
-	BowAimbotPart = BowAimbot.CreateDropdown({
-		Name = "Part",
-		List = {"HumanoidRootPart", "Head"},
-		Function = function() end
-	})
-	BowAimbotFOV = BowAimbot.CreateSlider({
-		Name = "FOV",
-		Function = function() end,
-		Min = 1,
-		Max = 1000,
-		Default = 1000
-	})
-	BowAimbotProjectiles = BowAimbot.CreateToggle({
-		Name = "Other Projectiles",
-		Function = function() end,
-		Default = true
-	})
-end)--]]
-
---until I find a way to make the spam switch item thing not bad I'll just get rid of it, sorry.
 local Scaffold = {Enabled = false}
 run(function()
 	local scaffoldtext = Instance.new("TextLabel")
