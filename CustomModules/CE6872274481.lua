@@ -7476,7 +7476,6 @@ run(function()
 	local AutoConsumeStar = {Enabled = false}
 	local AutoConsumeHealth = {Value = 100}
 	local AutoConsumeSpeed = {Enabled = true}
-	local AutoConsumeDelay = tick()
 
 	local function AutoConsumeFunc()
 		if entityLibrary.isAlive then
@@ -7485,17 +7484,14 @@ run(function()
 				autobankapple = true
 				local item = getItem("apple")
 				local pot = getItem("heal_splash_potion")
-				if (item or pot) and AutoConsumeDelay <= tick() then
 					if item then
 						bedwars.Client:Get(bedwars.EatRemote):InvokeServer({
 							item = item.tool
 						})
-						AutoConsumeDelay = tick() + 0.6
 					else
 						local newray = game.Workspace:Raycast((oldcloneroot or entityLibrary.character.HumanoidRootPart).Position, Vector3.new(0, -76, 0), store.blockRaycast)
 						if newray ~= nil then
-							bedwars.Client:Get(bedwars.ProjectileRemote):InvokeServer(pot.tool, "heal_splash_potion", "heal_splash_potion", (oldcloneroot or entityLibrary.character.HumanoidRootPart).Position, (oldcloneroot or entityLibrary.character.HumanoidRootPart).Position, Vector3.new(0, -70, 0), game:GetService("HttpService"):GenerateGUID(), {drawDurationSeconds = 1})
-						end
+						bedwars.Client:Get(bedwars.ProjectileRemote):InvokeServer(pot.tool, "heal_splash_potion", "heal_splash_potion", (oldcloneroot or entityLibrary.character.HumanoidRootPart).Position, (oldcloneroot or entityLibrary.character.HumanoidRootPart).Position, Vector3.new(0, -70, 0), game:GetService("HttpService"):GenerateGUID(), {drawDurationSeconds = 1})
 					end
 				end
 			else
