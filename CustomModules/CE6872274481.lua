@@ -3648,7 +3648,7 @@ run(function()
 	local FlyOverlap = OverlapParams.new()
 	FlyOverlap.MaxParts = 9e9
 	FlyOverlap.FilterDescendantsInstances = {}
-	FlyOverlap.RespectCanCollide = true
+	FlyOverlap.RespectCanCollide = false
 
 	local function disablefunc()
 		if bodyvelo then bodyvelo:Destroy() end
