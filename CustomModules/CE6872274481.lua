@@ -725,9 +725,7 @@ function bedwars.SwordController:playSwordEffect(swordmeta, status)
 		local lplr = game:GetService("Players").LocalPlayer
 		animation = bedwars.AnimationUtil:playAnimation(lplr, bedwars.BlockController:getAnimationController():getAssetId(bedwars.AnimationUtil:fetchAnimationIndexId(animName)))
 		task.wait(animCooldown)
-		if animation ~= nil then
-			animation:Stop()
-			animation:Destroy()
+		if animation ~= nil then animation:Stop(); animation:Destroy() end
 		end
 	end)
 end
@@ -1539,16 +1537,39 @@ end--]]
 local isZephyr = false
 --local desyncboost = {Enabled = false}
 --local killauraNearPlayer
-
+local oldhealth
+local lastdamagetick = tick()
+task.spawn(function()
+	repeat task.wait() until entityLibrary.isAlive
+	oldhealth = game:GetService("Players").LocalPlayer.Character.Humanoid.Health
+	game:GetService("Players").LocalPlayer.Character.Humanoid.HealthChanged:Connect(function(new)
+		repeat task.wait() until entityLibrary.isAlive
+		if new < oldhealth then
+			lastdamagetick = tick() + 0.25
+		end
+		oldhealth = new
+	end)
+end)
+game:GetService("Players").LocalPlayer.CharacterAdded:Connect(function()
+	repeat task.wait() until entityLibrary.isAlive
+	local oldhealth = game:GetService("Players").LocalPlayer.Character.Humanoid.Health
+	game:GetService("Players").LocalPlayer.Character.Humanoid.HealthChanged:Connect(function(new)
+		if new < oldhealth then
+			lastdamagetick = tick() + 0.25
+		end
+		oldhealth = new
+	end)
+end)
 shared.zephyrActive = false
 shared.scytheActive = false
+shared.SpeedBoostEnabled = false
 shared.scytheSpeed = 5
 local function getSpeed(reduce)
 	local speed = 0
 	if lplr.Character then
 		local SpeedDamageBoost = lplr.Character:GetAttribute("SpeedBoost")
 		if SpeedDamageBoost and SpeedDamageBoost > 1 then
-			speed = speed + (8.5 * (SpeedDamageBoost - 1))
+			speed = speed + (8 * (SpeedDamageBoost - 1))
 		end
 		if store.grapple > tick() then
 			speed = speed + 90
@@ -1559,6 +1580,10 @@ local function getSpeed(reduce)
 		if lplr.Character:GetAttribute("GrimReaperChannel") then
 			speed = speed + 20
 		end
+		print(tostring(lastdamagetick > tick()), tostring(shared.SpeedBoostEnabled))
+		if lastdamagetick > tick() and shared.SpeedBoostEnabled then
+			speed = speed + 10
+		end;
 		local armor = store.localInventory.inventory.armor[3]
 		if type(armor) ~= "table" then armor = {itemType = ""} end
 		if armor.itemType == "speed_boots" then
@@ -1573,9 +1598,6 @@ local function getSpeed(reduce)
 			isZephyr = false
 		end
 	end
-	pcall(function()
-		--speed = speed + (CheatEngineHelper.SprintEnabled and 23 - game:GetService("Players").LocalPlayer.Character.Humanoid.WalkSpeed or 0)
-	end)
 	return reduce and speed ~= 1 and math.max(speed * (0.8 - (0.3 * math.floor(speed))), 1) or speed
 end
 VoidwareFunctions.GlobaliseObject("getSpeed", getSpeed)
