@@ -5476,9 +5476,11 @@ run(function()
 		Name = "Speed",
 		Function = function(callback)
 			if callback then
+				shared.SpeedBoostEnabled = SpeedDamageBoost.Enabled
 				table.insert(Speed.Connections, vapeEvents.EntityDamageEvent.Event:Connect(function(damageTable)
 					if damageTable.entityInstance == lplr.Character and (damageTable.damageType ~= 0 or damageTable.extra and damageTable.extra.chargeRatio ~= nil) and (not (damageTable.knockbackMultiplier and damageTable.knockbackMultiplier.disabled or damageTable.knockbackMultiplier and damageTable.knockbackMultiplier.horizontal == 0)) and SpeedDamageBoost.Enabled then 
 						damagetick = tick() + 0.4
+						lastdamagetick = tick() + 0.4
 					end
 				end))
 				RunLoops:BindToHeartbeat("Speed", function(delta)
