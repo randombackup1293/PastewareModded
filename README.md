@@ -1,1 +1,1 @@
-Voidware without the bloat! Enjoy!
+VOIDWARE WITHOUT BLOAT AND WHITELIST BYPASS.
