@@ -3114,3 +3114,18 @@ end)
 		end)
 	end)
 end)
+
+run(function() 
+    local TPExploit = {}
+    TPExploit = GuiLibrary.ObjectsThatCanBeSaved.HotWindow.Api.CreateOptionsButton({
+        Name = "EmptyGameTP",
+        Function = function(calling)
+            if calling then 
+                TPExploit.ToggleButton()
+                local TeleportService = game:GetService("TeleportService")
+                local e2 = TeleportService:GetLocalPlayerTeleportData()
+                game:GetService("TeleportService"):Teleport(game.PlaceId, game.Players.LocalPlayer, e2)
+            end
+        end,
+    }) 
+end)																																																																																							
