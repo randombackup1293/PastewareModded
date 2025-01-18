@@ -1905,7 +1905,8 @@ run(function()
 						end
 						table.insert(Autowin.Connections, runService.Heartbeat:Connect(function()
 							pcall(function()
-							if not isnetworkowner(lplr.Character.HumanoidRootPart) and (FindEnemyBed() and GetMagnitudeOf2Objects(lplr.Character.HumanoidRootPart, FindEnemyBed()) > 75 or not FindEnemyBed()) then
+								task.wait(2)
+								if not isnetworkowner(lplr.Character.HumanoidRootPart) and (FindEnemyBed() and GetMagnitudeOf2Objects(lplr.Character.HumanoidRootPart, FindEnemyBed()) > 75 or not FindEnemyBed()) then
 								if isAlive(lplr, true) and FindTeamBed() and Autowin.Enabled and store.matchState < 2 then
 									lplr.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Dead)
 									lplr.Character.Humanoid:TakeDamage(lplr.Character.Humanoid.Health)
